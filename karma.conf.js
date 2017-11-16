@@ -1,16 +1,14 @@
 module.exports = function (config) {
   const jqueryFile = process.env.USE_OLD_JQUERY === 'true' ? 'js/tests/vendor/jquery-1.9.1.min.js' : 'assets/js/vendor/jquery-slim.min.js'
 
-  // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-  const browsers = ['ChromeHeadless', 'FirefoxHeadless']
-  // if we run our test on Travis we just use ChromeHeadless because Firefox isn't well supported
-  if (typeof process.env.TRAVIS_JOB_ID !== 'undefined') {
-    browsers.pop()
-  }
-
   config.set({
-    frameworks: ['qunit'],
-    plugins: ['karma-chrome-launcher', 'karma-firefox-launcher', 'karma-qunit'],
+    frameworks: ['qunit', 'detectBrowsers'],
+    plugins: [
+      'karma-chrome-launcher',
+      'karma-firefox-launcher',
+      'karma-qunit',
+      'karma-detect-browsers'
+    ],
     // list of files / patterns to load in the browser
     files: [
       jqueryFile,
@@ -26,7 +24,6 @@ module.exports = function (config) {
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_ERROR || config.LOG_WARN,
     autoWatch: false,
-    browsers,
     customLaunchers: {
       FirefoxHeadless: {
         base: 'Firefox',
@@ -34,6 +31,20 @@ module.exports = function (config) {
       },
     },
     singleRun: true,
-    concurrency: Infinity
+    concurrency: Infinity,
+    detectBrowsers: {
+      usePhantomJS: false,
+      postDetection: function (availableBrowser) {
+        if (typeof process.env.TRAVIS_JOB_ID !== 'undefined' || availableBrowser.indexOf('Chrome') !== -1) {
+          return ['ChromeHeadless']
+        }
+
+        if (availableBrowser.indexOf('Firefox') !== -1) {
+          return ['FirefoxHeadless']
+        }
+
+        throw new Error('Please install Firefox or Chrome')
+      }
+    }
   })
 }
