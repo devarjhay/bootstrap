@@ -1,4 +1,6 @@
-module.exports = function (config) {
+'use strict'
+
+module.exports = (config) => {
   const jqueryFile = process.env.USE_OLD_JQUERY === 'true' ? 'js/tests/vendor/jquery-1.9.1.min.js' : 'assets/js/vendor/jquery-slim.min.js'
 
   config.set({
@@ -27,19 +29,19 @@ module.exports = function (config) {
     customLaunchers: {
       FirefoxHeadless: {
         base: 'Firefox',
-        flags: ['-headless'],
-      },
+        flags: ['-headless']
+      }
     },
     singleRun: true,
     concurrency: Infinity,
     detectBrowsers: {
       usePhantomJS: false,
-      postDetection: function (availableBrowser) {
-        if (typeof process.env.TRAVIS_JOB_ID !== 'undefined' || availableBrowser.indexOf('Chrome') !== -1) {
+      postDetection(availableBrowser) {
+        if (typeof process.env.TRAVIS_JOB_ID !== 'undefined' || availableBrowser.includes('Chrome')) {
           return ['ChromeHeadless']
         }
 
-        if (availableBrowser.indexOf('Firefox') !== -1) {
+        if (availableBrowser.includes('Firefox')) {
           return ['FirefoxHeadless']
         }
 
