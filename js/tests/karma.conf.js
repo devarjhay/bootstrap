@@ -4,6 +4,7 @@ module.exports = (config) => {
   const jqueryFile = process.env.USE_OLD_JQUERY === 'true' ? 'js/tests/vendor/jquery-1.9.1.min.js' : 'assets/js/vendor/jquery-slim.min.js'
 
   config.set({
+    basePath: '../..',
     frameworks: ['qunit', 'detectBrowsers'],
     plugins: [
       'karma-chrome-launcher',
